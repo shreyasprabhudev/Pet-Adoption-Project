@@ -4,7 +4,7 @@
 <div class="col-md-6 offset-md-3"></div>
 <h1>Add Record:</h1>
 <br/>
-<form method="POST" action="{% url 'add_record' %}">
+<form method="POST" action="{% url 'add_record' %}" enctype="multipart/form-data">
     {% csrf_token %}
 
     {{ form.as_p }}

@@ -22,26 +22,52 @@ def home(request):
             return redirect('home')
     else:
         return render(request, 'home.html', {'records': records, 'shelters': shelters, 'pets': pets})
+    
+def adoptable_pets(request):
+    pets = Pet.objects.all()
+
+    if request.user.is_authenticated:
+        return render(request, 'adoptable_pets.html', {'pets': pets})
+    else:
+        messages.success(request, "You Must Be Logged In!")
+        return redirect('home')
 
 def logout_user(request):
     logout(request)
-    messages.success(request, "You have been logged out!")
+    messages.success(request, "You Have Been Logged Out!")
     return redirect('home')
 
 def register_user(request):
+    if request.user.is_authenticated:
+        messages.success(request, "You Are Already Logged In!")
+        return redirect('home')
+
     if request.method == 'POST':
         form = SignUpForm(request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
             username = form.cleaned_data['username']
             password = form.cleaned_data['password1']
             user = authenticate(username=username, password=password)
             login(request, user)
+
+            user_info = UserInformation(
+                first_name=form.cleaned_data['first_name'],
+                last_name=form.cleaned_data['last_name'],
+                email=form.cleaned_data['email'],
+                phone=form.cleaned_data['phone_number'],
+                address=form.cleaned_data['address'],
+                city=form.cleaned_data['city'],
+                state=form.cleaned_data['state'],
+                zipcode=form.cleaned_data['zipcode'],
+            )
+            user_info.save()
+
+
             messages.success(request, "You Have Successfully Registered!")
             return redirect('home')
     else:
         form = SignUpForm()
-        return render(request, 'register.html', {'form': form})
     
     return render(request, 'register.html', {'form': form})
 
@@ -64,7 +90,7 @@ def delete_record(request, pk):
         return redirect('home')
 
 def add_record(request):
-    form = AddRecordForm(request.POST or None)
+    form = AddRecordForm(request.POST or None, request.FILES)
     if request.user.is_authenticated:
         if request.method == "POST":
             if form.is_valid():

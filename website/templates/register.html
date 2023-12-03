@@ -2,8 +2,28 @@
 
 {% block content %}
 
+<div class="container">
+	<div class="row">
+	  <div class="col-12 col-md-8 col-lg-6 m-auto">
+		<div class="card border-0 shadow">
+		  <div class="card-body">
+			<h2 class="text-center mb-4">Register</h2>
+			<form method="POST" action="{% url 'register' %}">
+			  {% csrf_token %}
+			  {{ form.as_p }}
+			  <div class="text-center mt-3">
+				<button type="submit" class="btn btn-primary">Register</button>
+			  </div>
+			</form>
+		  </div>
+		</div>
+	  </div>
+	</div>
+  </div>
+
+<!--
 <div class="col-md-6 offset-md-3"></div>
-<ht>Register</ht>
+
 <br/>
 
 <form method="POST" action="">
@@ -26,6 +46,7 @@
         </form>
 </form>
 </div>
+-->
 
 
 {% endblock %}

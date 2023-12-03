@@ -40,6 +40,7 @@ class Pet(models.Model):
     age = models.IntegerField()
     sex = models.CharField(max_length=1)
     fixed = models.BooleanField()
+    pet_image = models.ImageField(null=True, blank=True, upload_to="images/")
     pet_shelter_id = models.ForeignKey(Shelter, on_delete=models.SET_NULL, related_name="pet", null=True)
 
     def __str__(self):
