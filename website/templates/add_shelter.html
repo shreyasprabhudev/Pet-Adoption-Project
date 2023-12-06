@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="container">
+	<div class="row">
+	  <div class="col-12 col-md-8 col-lg-6 m-auto">
+		<div class="card border-0 shadow">
+		  <div class="card-body">
+			<h2 class="text-center mb-4">Add Shelter</h2>
+			<form method="POST" action="{% url 'add_shelter' %}" enctype="multipart/form-data">
+			  {% csrf_token %}
+			  {{ form.as_p }}
+			  <div class="text-center mt-3">
+				<button type="submit" class="btn btn-primary">Add Shelter</button>
+				<a href="{% url 'home' %}" class="btn btn-secondary">Back</a>
+			  </div>
+			</form>
+		  </div>
+		</div>
+	  </div>
+	</div>
+</div>
+
+{% endblock %}

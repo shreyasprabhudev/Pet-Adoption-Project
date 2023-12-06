@@ -10,25 +10,29 @@
       </button>
       <div class="collapse navbar-collapse justify-content-between" id="navbarSupportedContent">
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0 d-flex align-items-center" style="font-size: 20px;">
-            {% if user.is_authenticated %}
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'adoptable_pets' %}">Adoptable Pets</a>
+          {% if user.is_authenticated %}
+          {% if user.userinformation.is_employee %}
+              <li class="nav-item">
+                  <a class="nav-link" href="{% url 'add_pet' %}">Add Pet</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'add_shelter' %}">Add Shelter</a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" href="{% url 'add_record' %}">Add Record</a>
-            </li>
+          {% endif %}
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+              <a class="nav-link" href="{% url 'adoptable_pets' %}">Adoptable Pets</a>
+          </li>
+          <li class="nav-item">
+              <a class="nav-link" href="{% url 'logout' %}">Logout</a>
           </li>
           {% else %}
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'register' %}">Register</a>
-          </li>
+              <li class="nav-item">
+                  <a class="nav-link" href="{% url 'register' %}">Register</a>
+              </li>
 
-          <li class="nav-item">
-            <a class="nav-link" href="{% url 'home' %}">Login</a>
-          </li>
-
+              <li class="nav-item">
+                  <a class="nav-link" href="{% url 'home' %}">Login</a>
+              </li>
           {% endif %}
 
         </ul>
