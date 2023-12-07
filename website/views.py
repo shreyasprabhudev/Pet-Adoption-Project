@@ -5,9 +5,8 @@ from .forms import SignUpForm, AddUserInformationForm, AddPetForm, AddShelterFor
 from .models import UserInformation, Shelter, Pet, Employee
 
 def home(request):
-    users = UserInformation.objects.all()
-    shelters = Shelter.objects.all()
-    pets = Pet.objects.all()
+    if request.user.is_authenticated:
+        return redirect('adoptable_pets')
 
     if request.method == 'POST':
         username = request.POST['username']
@@ -16,12 +15,12 @@ def home(request):
         if user is not None:
             login(request, user)
             messages.success(request, "You Have Been Logged In!")
-            return redirect('home')
+            return redirect('adoptable_pets')
         else:
-            messages.success(request, "There was an error!")
+            messages.error(request, "There was an error logging in!")
             return redirect('home')
     else:
-        return render(request, 'home.html', {'users': users, 'shelters': shelters, 'pets': pets})
+        return render(request, 'home.html')
     
 def adoptable_pets(request):
     pets = Pet.objects.all()
