@@ -1,8 +1,8 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
-from .forms import SignUpForm, AddUserInformationForm, AddPetForm, AddShelterForm
-from .models import UserInformation, Shelter, Pet, Employee
+from .forms import SignUpForm, AddPetForm, AddShelterForm
+from .models import UserInformation, Shelter, Pet
 
 def home(request):
     if request.user.is_authenticated:
@@ -135,49 +135,43 @@ def user_record(request, pk):
         messages.success(request, "You Must Be Logged In To View That Page...")
         return redirect('home')
     
-def delete_record(request, pk):
-    user_info = UserInformation.objects.get(user=request.user)
-    if request.user.is_authenticated and user_info.is_employee:
+def delete_pet(request, pk):
+    if request.user.is_authenticated:
+        user_info = UserInformation.objects.get(user=request.user)
         if user_info.is_employee:
-            delete = UserInformation.objects.get(id=pk)
-            delete.delete()
-            messages.success(request, "Record Deleted Successfully!")
+            pet_to_delete = get_object_or_404(Pet, pk=pk)
+            pet_to_delete.delete()
+            messages.success(request, "Pet Record Deleted Successfully!")
+            return redirect('adoptable_pets')
+        else:
+            messages.error(request, "Access Denied: You Must Be An Employee!")
             return redirect('home')
     else:
-        messages.success(request, "Access Denied: You Must Be An Employee!")
-        return redirect('home')
-
-def add_record(request):
-    if request.user.is_authenticated:
-        user_info = UserInformation.objects.get(user=request.user)
-        if user_info.is_employee:
-            if request.method == "POST":
-                form = AddUserInformationForm(request.POST or None, request.FILES)
-                if form.is_valid():
-                    add_record = form.save()
-                    messages.success(request, "Record Added!")
-                    return redirect('home')
-            else:
-                form = AddUserInformationForm()
-            return render(request, 'add_record.html', {'form': form})
-    else:
-        messages.success(request, "Access Denied: You Must Be An Employee!")
+        messages.error(request, "You Must Be Logged In!")
         return redirect('home')
     
-def update_record(request, pk):
+def update_pet(request, pk):
     if request.user.is_authenticated:
-        current_record = UserInformation.objects.get(id=pk)
-        user_info = UserInformation.objects.get(user=request.user)
+        try:
+            user_info = UserInformation.objects.get(user=request.user)
+        except UserInformation.DoesNotExist:
+            messages.error(request, "User information not found. Please complete your profile.")
+            return redirect('home')
+
         if user_info.is_employee:
+            current_pet = get_object_or_404(Pet, pk=pk)
             if request.method == "POST":
-                form = AddUserInformationForm(request.POST or None, instance=current_record)
+                form = AddPetForm(request.POST, request.FILES, instance=current_pet)
                 if form.is_valid():
                     form.save()
-                    messages.success(request, "Record Has Been Updated!")
-                    return redirect('home')
+                    messages.success(request, "Pet Information Has Been Updated!")
+                    return redirect('adoptable_pets')
             else:
-                return redirect('home')
-        return render(request, 'update_record.html', {'form': form})
+                form = AddPetForm(instance=current_pet)
+            return render(request, 'update_pet.html', {'form': form, 'pet': current_pet})
+        else:
+            messages.error(request, "Access Denied: You Must Be An Employee!")
+            return redirect('home')
     else:
-        messages.success(request, "Access Denied: You Must Be An Employee!")
+        messages.error(request, "You Must Be Logged In!")
         return redirect('home')
